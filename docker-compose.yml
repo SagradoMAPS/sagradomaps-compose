@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: grlgmrs/sagradomaps-fe:latest
+    ports:
+      - "80:80"
+    networks:
+      - app_network
+    depends_on:
+      - backend
+
+  backend:
+    image: jeanbeltrame/sagradomaps:latest
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_PORT-8080}"
+    environment:
+      - SAGRADOMAPS_DATASOURCE_URL=${SAGRADOMAPS_DATASOURCE_URL}
+      - SAGRADOMAPS_DATASOURCE_USERNAME=${SAGRADOMAPS_DATASOURCE_USERNAME}
+      - SAGRADOMAPS_DATASOURCE_PASSWORD=${SAGRADOMAPS_DATASOURCE_PASSWORD}
+      - SERVER_PORT=${SERVER_PORT}
+      - BYPASS_USER_REGISTRATION=${BYPASS_USER_REGISTRATION}
+      - JWT_TOKEN_EXPIRATION_TIME=${JWT_TOKEN_EXPIRATION_TIME}
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-sagradomaps}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:
+    driver: bridge
