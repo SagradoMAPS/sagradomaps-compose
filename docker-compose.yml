@@ -5,6 +5,9 @@ services:
     image: grlgmrs/sagradomaps-fe:latest
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     networks:
       - app_network
     depends_on:
